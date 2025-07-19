@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace service;
+namespace services;
 
 public class jwtt
 {
@@ -18,9 +18,10 @@ public class jwtt
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        new Claim(ClaimTypes.Name, email),
+        new Claim(JwtRegisteredClaimNames.Email, email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
@@ -32,4 +33,5 @@ public class jwtt
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 }

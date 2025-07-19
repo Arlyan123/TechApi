@@ -3,17 +3,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using service;
+using services;
 using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("dbschool")));
 
 builder.Services.AddScoped<StudentService>();
 builder.Services.AddScoped<jwtt>();
+builder.Services.AddScoped<TeacherService, TeacherService>();
+builder.Services.AddScoped<SubjectsService, SubjectsService>();
+builder.Services.AddScoped<StudentGradesService, StudentGradesService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -31,36 +36,42 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
+
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
+
+
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Student API", Version = "v1" });
 
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("JWT", new OpenApiSecurityScheme
     {
-        Description = "Autenticación JWT con el esquema Bearer. Ejemplo: 'Bearer {token}'",
+        Description = "Ingresa token JWT",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Scheme = "Bearer",
         Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT"
+        Scheme = "JWT"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
+{
     {
+        new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+            Reference = new OpenApiReference {
+                Type = ReferenceType.SecurityScheme,
+                Id = "JWT"
+            }
+        },
+        Array.Empty<string>()
+    }
     });
+
 });
 
 builder.Services.AddControllers();

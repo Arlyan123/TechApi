@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using service;
+using services;
 
 namespace Controllers;
 
@@ -14,11 +14,13 @@ public class AuthController : ControllerBase
         _jwt = jwt;
     }
 
+
+
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest req)
+    public IActionResult Login([FromBody] LoginDto req)
     {
-        // Simulamos autenticación
-        if (req.Email == "admin@test.com" && req.Password == "1234")
+        //simulacro de login
+        if (req.Email == "sebastianmalambo9@gmail.com" && req.Password == "123")
         {
             var token = _jwt.GenerateToken(req.Email);
             return Ok(new { token });
@@ -26,10 +28,7 @@ public class AuthController : ControllerBase
 
         return Unauthorized();
     }
+
+
 }
 
-public class LoginRequest
-{
-    public string Email { get; set; }
-    public string Password { get; set; }
-}
