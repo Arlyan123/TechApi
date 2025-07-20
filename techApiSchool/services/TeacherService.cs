@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace services;
 
+/// <summary>
+/// Servicio para Profesores
+/// </summary> 
 public class TeacherService
 {
     private readonly AppDbContext _db;
@@ -14,19 +17,41 @@ public class TeacherService
         _db = db;
     }
 
-    public async Task<List<Teachers>> GetAllAsync() => await _db.Teachers.Where(t => !t.IsDeleted).Include(t => t.Subjects).ToListAsync();
+    public async Task<List<Teachers>> GetAllAsynca()
+        => await _db.Teachers.Where(t => !t.IsDeleted)
+        .ToListAsync();
+
+
+    public async Task<List<TeacherDtoC>> GetAllAsync()
+    {
+        return await _db.Teachers
+            .Where(t => !t.IsDeleted)
+            .Include(t => t.Subjects)
+            .Select(t => new TeacherDtoC
+            {
+                Id = t.Id,
+                FullName = t.FullName,
+                Telefono = t.Telefono,
+                Direccion = t.Direccion,
+                Subjects = t.Subjects.Select(s => s.Name).ToList()
+            })
+            .ToListAsync();
+    }
 
     public async Task<Teachers?> GetByIdAsync(Guid id) => await _db.Teachers.Include(t => t.Subjects).FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted);
 
-    public async Task CreateAsync(TeacherDto dto)
+    public async Task<Guid> CreateAsync(TeacherDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.FullName))
             throw new ArgumentException("FullName es requerido!");
 
-        var teacher = new Teachers { FullName = dto.FullName };
+        var teacher = new Teachers { FullName = dto.FullName , Direccion = dto.Direccion, Telefono = dto.Telefono};
         _db.Teachers.Add(teacher);
         await _db.SaveChangesAsync();
+
+        return teacher.Id;
     }
+
 
     public async Task UpdateAsync(Guid id, TeacherDto dto)
     {
@@ -37,6 +62,8 @@ public class TeacherService
             throw new ArgumentException("Fullname es requerido!");
 
         teacher.FullName = dto.FullName;
+        teacher.Telefono = dto.Telefono;
+        teacher.Direccion = dto.Direccion;
         await _db.SaveChangesAsync();
     }
 

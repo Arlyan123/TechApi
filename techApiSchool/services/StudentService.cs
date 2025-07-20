@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace services;
 
+/// <summary>
+/// Servicio para estudiantes
+/// </summary>
+
 public class StudentService
 {
     private readonly AppDbContext _db;

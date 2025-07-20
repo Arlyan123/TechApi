@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
         _httpContextAccessor = httpContextAccessor;
     }
 
+
     public DbSet<Student> Students => Set<Student>();
     public DbSet<Audit> Audit => Set<Audit>();
     public DbSet<Teachers> Teachers { get; set; }
@@ -27,6 +28,25 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        //excluir registros en todas partes que tengan IsDeleted en verdadero
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var isDeletedProp = entityType.ClrType.GetProperty("IsDeleted");
+            if (isDeletedProp != null && isDeletedProp.PropertyType == typeof(bool))
+            {
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+                var property = Expression.Call(
+                    typeof(EF), nameof(EF.Property), new[] { typeof(bool) },
+                    parameter, Expression.Constant("IsDeleted")
+                );
+                var compare = Expression.Equal(property, Expression.Constant(false));
+                var lambda = Expression.Lambda(compare, parameter);
+
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+            }
+        }
+
         modelBuilder.Entity<Student>().ToTable("students");
         modelBuilder.Entity<Audit>().ToTable("audit");
         modelBuilder.Entity<Teachers>().ToTable("Teachers");

@@ -3,6 +3,10 @@ using services;
 
 namespace Controllers;
 
+/// <summary>
+/// Generar Token
+/// </summary>
+
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -15,7 +19,10 @@ public class AuthController : ControllerBase
     }
 
 
-
+    /// <summary>
+    /// Post de Login / Correo personal de Ing.Sebastian y password se envió en el correo
+    /// </summary>
+    /// <param name="req">Correo personal de Ing.Sebastian y password se envió en el correo</param>
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDto req)
     {

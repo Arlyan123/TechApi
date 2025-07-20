@@ -19,7 +19,7 @@ public class SubjectsService
 
     public Task<Subjects?> GetByIdAsync(Guid id) => _db.Subjects.FindAsync(id).AsTask();
 
-    public async Task CreateAsync(SubjectDto dto)
+    public async Task<Guid> CreateAsync(SubjectDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
             throw new ArgumentException("Nombre del Curso es requerido.");
@@ -36,6 +36,8 @@ public class SubjectsService
 
         _db.Subjects.Add(subject);
         await _db.SaveChangesAsync();
+
+        return teacher.Id;
     }
 
     public async Task UpdateAsync(Guid id, SubjectDto dto)

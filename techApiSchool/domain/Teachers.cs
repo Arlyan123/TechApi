@@ -12,6 +12,12 @@ public class Teachers
     [Display(Name = "Nombre Completo")]
     public string? FullName { get; set; } = string.Empty;
 
+    [Display(Name = "Telefono")]
+    public string? Telefono { get; set; } = string.Empty;
+
+    [Display(Name = "Direccion")]
+    public string? Direccion { get; set; } = string.Empty;
+
     [Display(Name = "Esta Eliminado")]
     public bool IsDeleted { get; set; } = false;
 
